@@ -5,6 +5,9 @@ from pathlib import Path
 from datetime import datetime
 import numpy as np
 import pandas as pd
+import matplotlib
+# Use a non-interactive backend to avoid GUI/display issues in headless environments
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from docx import Document

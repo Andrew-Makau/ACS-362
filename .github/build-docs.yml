@@ -1,0 +1,40 @@
+name: Build and Commit Docs
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "scripts/**"
+      - "requirements.txt"
+      - ".github/workflows/build-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Generate DOCX and PPTX
+        run: |
+          python scripts/generate_docs.py
+      - name: Commit generated artifacts
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add deliverables/*.docx deliverables/*.pptx deliverables/charts/*.png deliverables/data/*.csv || true
+          git commit -m "Auto-generate Cash Flow Forecasting .docx and .pptx with charts" || echo "No changes to commit"
+          git push
